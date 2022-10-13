@@ -39,25 +39,25 @@ class Mastermind
       user_guess
     end
     guess = guess.split('')
-    # p guess
-    process_guess(guess)
-    # puts guess
-    # puts guess.length
-    # puts guess.to_i.integer?
-    # puts guess.to_i
-    # p guess
-    # p guess.length
-    # p guess.integer?
+    p generate_hints(guess)
   end
 
-  def self.process_guess(guess)
+  def self.generate_hints(guess)
     hints = []
+    # create copy of master code
+    master = []
+    master.replace(@master_code)
+    # find exact match
     guess.each_with_index do |item, index|
-      if @master_code[index] == item
-        hints[index] = "X"
+      if master[index] == item
+        hints << 'X'
+        master[index] = 0
       end
     end
-    p hints
+    # find match in wrong location
+    intersection = guess.intersection(master)
+    intersection.size.times { hints << 'O' }
+    hints
   end
 end
 
