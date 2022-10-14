@@ -72,16 +72,11 @@ class Mastermind
     # find exact match
     guess_copy.each_with_index do |item, index|
       if master_copy[index] == item
-        hints << 'X'
+        hints.unshift('X')
         master_copy[index] = '7'
         guess_copy[index] = '8'
-      end
-    end
-
-    # find match in wrong location
-    guess_copy.each_with_index do |item, index|
-      if master_copy.include?(item) && master_copy[index] != item
-        hints << '0'
+      elsif master_copy.include?(item) && master_copy[index] != item
+        hints.push('0')
         doomed_index = master_copy.find_index(item)
         master_copy[doomed_index] = '7'
         # guess_copy[index] = 8
