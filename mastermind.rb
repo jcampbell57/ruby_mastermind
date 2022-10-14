@@ -3,8 +3,12 @@ class Mastermind
 
   def self.start_game
     @master_code = generate_code
-    puts 'Guess the code:'
-    user_guess
+    12.times do 
+      puts 'Guess the code:'
+      user_guess 
+    end
+    # user_guess
+    p 'Correct solution:'
     p @master_code
   end
 
@@ -36,27 +40,59 @@ class Mastermind
   def self.validate_guess(guess)
     if guess.length > 4
       puts 'Guess too long, please input four digits:'
-      user_guess
+      # user_guess
+      # exit
+      # break
+    elsif guess.length < 4
+      puts 'Guess too short, please input four digits:'
+      # user_guess
+      # exit
+      # break
+    else
+      guess = guess.split('')
+      if guess == @master_code
+        puts 'Congratulation, you broke the code!'
+        exit
+      end
+      p generate_hints(guess)
     end
-    guess = guess.split('')
-    p generate_hints(guess)
   end
 
   def self.generate_hints(guess)
     hints = []
+
+    # create copy of guess
+    guess_copy = []
+    guess_copy.replace(guess)
+
     # create copy of master code
-    master = []
-    master.replace(@master_code)
+    master_copy = []
+    master_copy.replace(@master_code)
+
     # find exact match
-    guess.each_with_index do |item, index|
-      if master[index] == item
+    guess_copy.each_with_index do |item, index|
+      if master_copy[index] == item
         hints << 'X'
-        master[index] = 0
+        master_copy[index] = '7'
+        guess_copy[index] = '8'
       end
     end
+
     # find match in wrong location
-    intersection = guess.intersection(master)
-    intersection.size.times { hints << 'O' }
+    guess_copy.each_with_index do |item, index|
+      if master_copy.include?(item) && master_copy[index] != item
+        hints << '0'
+        doomed_index = master_copy.find_index(item)
+        master_copy[doomed_index] = '7'
+        # guess_copy[index] = 8
+      end
+    end
+
+    # p "original guess:  #{guess}"
+    # p "original master: #{@master_code}"
+    # p "guess copy:      #{guess_copy}"
+    # p "master copy:     #{master_copy}"
+
     hints
   end
 end
