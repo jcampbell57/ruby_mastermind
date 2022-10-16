@@ -3,37 +3,54 @@ module GameLogic
     hints = []
 
     # create copy of guess
-    guess_copy = []
-    guess_copy.replace(guess)
-
+    guess_copy = guess.clone
     # create copy of master code
-    master_copy = []
-    master_copy.replace(@master_code)
+    master_copy = @master_code.clone
 
+    exact_matches = exact_matches?(guess_copy, master_copy)
+    misplaced_matches = misplaced_matches?(guess_copy, master_copy)
+
+    exact_matches.times { hints.unshift('X') }
+    misplaced_matches.times {hints.push('O')}
+
+    # debugging:
+    # p "original guess:  #{guess}"
+    # p "original master: #{@master_code}"
+    # p "guess copy:      #{guess_copy}"
+    # p "master copy:     #{master_copy}"
+
+    hints
+  end
+
+  def exact_matches?(guess_copy, master_copy)
+    exact_match_count = 0
     guess_copy.each_with_index do |item, index|
       # find exact match
       if master_copy[index] == item
-        hints.unshift('X')
+        exact_match_count += 1
+        # remove item from master copy so it doesnt get flagged again.
         master_copy[index] = '7'
-        guess_copy[index] = '8'
-      # find match in wrong location
-      elsif master_copy.include?(item) && master_copy[index] != item
+        # guess_copy[index] = '8'
+      end
+    end
+    exact_match_count
+  end
+
+  def misplaced_matches?(guess_copy, master_copy)
+    misplaced_match_count = 0
+    # find match in wronmisplaced_match_countg location
+    guess_copy.each_with_index do |item, index|
+      if master_copy.include?(item) && master_copy[index] != item
         doomed_index = master_copy.find_index(item)
-        # check to see if there is exact match
+        # check exact match?
         unless guess_copy[doomed_index] == master_copy[doomed_index]
-          hints.push('0')
-          # remove item from master copy so it doesnt get flagged again if user put the same number multiple times.
-          master_copy[doomed_index] = '9'
+          misplaced_match_count += 1
+          # remove item from master copy so it doesnt get flagged again.
+          master_copy[doomed_index] = '7'
         end
         # guess_copy[index] = 8
       end
     end
-
-    p "original guess:  #{guess}"
-    p "original master: #{@master_code}"
-    p "guess copy:      #{guess_copy}"
-    p "master copy:     #{master_copy}"
-
-    hints
+    misplaced_match_count
   end
 end

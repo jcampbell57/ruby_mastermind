@@ -1,6 +1,9 @@
-require_relative "game_logic.rb"
+# frozen_string_literal: true
 
-class Code_maker
+require_relative 'game_logic'
+
+# Code maker logic
+class CodeMaker
   attr_accessor :master_code
 
   include GameLogic
@@ -9,10 +12,9 @@ class Code_maker
 
   end
 
-  def play 
+  def play
     puts 'Input a code:'
     master_code = gets.chomp
     puts master_code
   end
-
 end

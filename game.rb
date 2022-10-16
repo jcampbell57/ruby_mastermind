@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'player'
 require_relative 'computer'
 
@@ -6,9 +7,9 @@ require_relative 'computer'
 class Game
   def play
     game_info
-    game_mode = choose_mode.to_i
-    Code_breaker.new.play if game_mode == 1
-    Code_maker.new.play if game_mode == 2
+    game_mode = choose_mode
+    CodeBreaker.new.play if game_mode == 1
+    CodeMaker.new.play if game_mode == 2
   end
 
   def game_info
@@ -24,8 +25,9 @@ class Game
     puts '2. Code Setter'
     puts "Input '1' for Code Breaker or '2' for Code Setter:"
     mode_selection = gets.chomp
-    return mode_selection if mode_selection.match?(/^[1-2]$/)
+    return mode_selection.to_i if mode_selection.match?(/^[1-2]$/)
 
+    # if input is invalid:
     puts 'Invalid selection!'
     choose_mode
     # start_game
