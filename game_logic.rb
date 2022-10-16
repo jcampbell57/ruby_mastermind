@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Game logic methods
 module GameLogic
   def generate_hints(guess)
     hints = []

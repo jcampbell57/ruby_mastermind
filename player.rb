@@ -28,8 +28,7 @@ class CodeBreaker
   def start_game
     turn = 1
     while turn <= 12
-      puts 'Guess the code:'
-      @guess = user_guess.split('')
+      @guess = user_guess
       break if guess == master_code
 
       # if guess is incorrect:
@@ -40,13 +39,14 @@ class CodeBreaker
   end
 
   def user_guess
-    user_guess = gets.chomp
-    return user_guess if user_guess.match?(/^[0-6]{4}$/)
+    puts 'Guess the code:'
+    user_input = gets.chomp
+    return user_input.split('') if user_input.match?(/^[1-6]{4}$/)
 
     # when user guess is invalid:
-    puts 'Your guess must be four digits'
-    puts 'Digits must be greater than or equal to 1'
-    puts 'Digits must be less than or equal to 6'
+    puts '- Your guess must be four digits'
+    puts '- Digits must be greater than or equal to 1'
+    puts '- Digits must be less than or equal to 6'
     user_guess
   end
 
