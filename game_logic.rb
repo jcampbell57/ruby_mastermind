@@ -5,9 +5,7 @@ module GameLogic
   def generate_hints(guess)
     hints = []
 
-    # create copy of guess
     guess_copy = guess.clone
-    # create copy of master code
     master_copy = @master_code.clone
 
     exact_matches = exact_matches?(guess_copy, master_copy)
@@ -31,10 +29,10 @@ module GameLogic
       # find exact match
       if master_copy[index] == item
         exact_match_count += 1
-        @exact[index] = item
+        @exact << [item, index]
         # remove item from master copy so it doesnt get flagged again.
         master_copy[index] = '7'
-        # guess_copy[index] = '8'
+        guess_copy[index] = '8'
       end
     end
     exact_match_count

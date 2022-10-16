@@ -8,13 +8,15 @@ class CodeBreaker
 
   include GameLogic
 
-  def initialize 
+  def initialize
     @master_code = generate_code
+    # not utilized for player, only computer. But needed to not break hints
+    @exact = []
+    @misplaced = []
   end
 
   def generate_code
     code_numbers = %w[1 2 3 4 5 6]
-    # new_code = ['5', '4', '4', '1']
     new_code = []
     4.times { new_code << code_numbers.sample }
     new_code

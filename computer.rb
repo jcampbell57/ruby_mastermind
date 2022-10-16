@@ -13,7 +13,6 @@ class CodeMaker
     @exact = []
     @misplaced = []
     @code_numbers = %w[1 2 3 4 5 6]
-    @available_spots = [0, 1, 2, 3]
   end
 
   def play
@@ -37,11 +36,10 @@ class CodeMaker
     turn = 1
     while turn <= 12
       @guess = []
-      @available_spots = [0, 1, 2, 3]
       set_exact
       set_misplaced
       set_random
-      p @guess
+      puts "Computer guess: #{@guess}"
       break if guess == master_code
 
       # if guess is incorrect:
@@ -54,22 +52,20 @@ class CodeMaker
 
   def set_exact
     unless @exact.empty?
-      @exact.each_with_index do |item, index| 
-        @guess[index] = item
-        @available_spots.delete_at(index)
+      @exact.each do |item|
+        @guess[item[1]] = item[0]
       end
     end
   end
 
   def set_misplaced
     unless @misplaced.empty?
-      # p @misplaced
-      @misplaced.each_with_index do |item, index|
-        random = @available_spots.sample
-        # p @available_spots
-        # p "random #{random}"
-        @guess[random] = item[0]
-        @misplaced.delete_at(index)
+      4.times do |i|
+        if @guess[i].nil? && @misplaced.length.positive?
+          misplaced_sample = @misplaced.sample
+          @guess[i] = misplaced_sample[0]
+          @misplaced.delete_if { |item| item == misplaced_sample }
+        end
       end
     end
   end
@@ -80,7 +76,6 @@ class CodeMaker
         @guess[i] = @code_numbers.sample
       end
     end
-    p @guess
   end
 
   def end_game
