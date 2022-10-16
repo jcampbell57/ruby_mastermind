@@ -4,12 +4,16 @@ require_relative 'game_logic'
 
 # Code maker logic
 class CodeMaker
-  attr_accessor :master_code, :guess
+  attr_accessor :master_code, :guess, :misplaced
 
   include GameLogic
 
   def initialize
     @guess = []
+    @exact = []
+    @misplaced = []
+    @code_numbers = %w[1 2 3 4 5 6]
+    @available_spots = [0, 1, 2, 3]
   end
 
   def play
@@ -30,10 +34,14 @@ class CodeMaker
   end
 
   def start_game
-    code_numbers = %w[1 2 3 4 5 6]
     turn = 1
     while turn <= 12
-      4.times { @guess << code_numbers.sample}
+      @guess = []
+      @available_spots = [0, 1, 2, 3]
+      set_exact
+      set_misplaced
+      set_random
+      p @guess
       break if guess == master_code
 
       # if guess is incorrect:
@@ -42,6 +50,37 @@ class CodeMaker
       turn += 1
       sleep(0.5)
     end
+  end
+
+  def set_exact
+    unless @exact.empty?
+      @exact.each_with_index do |item, index| 
+        @guess[index] = item
+        @available_spots.delete_at(index)
+      end
+    end
+  end
+
+  def set_misplaced
+    unless @misplaced.empty?
+      # p @misplaced
+      @misplaced.each_with_index do |item, index|
+        random = @available_spots.sample
+        # p @available_spots
+        # p "random #{random}"
+        @guess[random] = item[0]
+        @misplaced.delete_at(index)
+      end
+    end
+  end
+
+  def set_random
+    4.times do |i|
+      if @guess[i].nil?
+        @guess[i] = @code_numbers.sample
+      end
+    end
+    p @guess
   end
 
   def end_game

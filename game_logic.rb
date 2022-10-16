@@ -31,6 +31,7 @@ module GameLogic
       # find exact match
       if master_copy[index] == item
         exact_match_count += 1
+        @exact[index] = item
         # remove item from master copy so it doesnt get flagged again.
         master_copy[index] = '7'
         # guess_copy[index] = '8'
@@ -48,6 +49,7 @@ module GameLogic
         # check exact match?
         unless guess_copy[doomed_index] == master_copy[doomed_index]
           misplaced_match_count += 1
+          @misplaced << [item, index]
           # remove item from master copy so it doesnt get flagged again.
           master_copy[doomed_index] = '7'
         end
