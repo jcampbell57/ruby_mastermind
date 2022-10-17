@@ -57,6 +57,7 @@ class CodeBreaker
       puts 'Congratulation, you broke the code!'
     else
       puts 'Better luck next time'
+      puts "The code was #{@master_code}"
     end
   end
 end
