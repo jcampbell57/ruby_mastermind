@@ -2,10 +2,11 @@
 
 # primary game logic
 class Game
-  attr_accessor :mode, :code
+  attr_accessor :mode, :code, :guess_count
 
   def initialize
     display_info
+    self.guess_count = 12
     # prompt_game_mode
     self.mode = 1
     start_game
@@ -40,19 +41,102 @@ class Game
     mode == 1 ? code_breaker_mode : code_setter_mode
   end
 
-  # code breaker
+  # game administration methods
+
+  def validate_input(player_input)
+    if player_input.digits.count != 4
+      print 'Input a four digit code (eg: 1234): '
+      validate_input(gets.chomp.to_i)
+    elsif player_input.to_s.match(/[1-6]/)
+      player_input
+    else
+      print 'Input a four digit code with digits 1-6: '
+      validate_input(gets.chomp.to_i)
+    end
+  end
+
+  # end game methods
+
+  def end_game(player_input)
+    if mode == 1
+      process_breaker_game(player_input)
+    elsif mode == 2
+      process_setter_game(player_input)
+    else
+      p "Game mode error. This shouldn't happen."
+    end
+  end
+
+  def process_breaker_game(player_input)
+    if player_input == code.join
+      puts "You broke the code in #{12 - guess_count} guesses!"
+      prompt_another_game
+    elsif guess_count.zero? 0
+      puts 'You ran out of guesses!'
+      prompt_another_game
+    else
+      puts 'I am not sure how that game ended.'
+      prompt_another_game
+    end
+  end
+
+  def process_setter_game
+    puts 'Game over!'
+  end
+
+  def prompt_another_game
+    print 'Would you like to play again? [Y/N]: '
+    input = gets.chomp
+    if input.upcase == 'Y'
+      Game.new
+    elsif input.upcase == 'N'
+      puts 'Goodbye!'
+      exit
+    else
+      puts 'Invalid input!'
+      prompt_another_game
+    end
+  end
+
+  # code breaker specific methods
 
   def code_breaker_mode
     randomize_code
+    prompt_player_input
   end
 
   def randomize_code
-    code_bank %w[1 2 3 4 5 6]
+    code_bank = %w[1 2 3 4 5 6]
     self.code = []
     4.times { code << code_bank.sample }
   end
 
-  # code setter
+  def prompt_player_input
+    end_game if guess_count.zero?
+    puts "Guesses left: #{guess_count}" if guess_count < 12
+    print 'Guess the code: '
+    puts "Hints: #{process_guess(validate_input(gets.chomp.to_i))}"
+  end
+
+  def process_guess(player_guess)
+    self.guess_count -= 1
+    end_game(player_guess) if player_guess == code.join
+    code_copy = code
+    hints = []
+    player_guess.digits.each_with_index do |number, index|
+      if code_copy[index] == number
+        code_copy[index] = 'X'
+        hints << 'X'
+        next
+      elsif code_copy.include?(number)
+        code_copy[code_copy.index(number)] = 'O'
+        hints << 'O'
+      end
+    end
+    hints
+  end
+
+  # code setter specific methods
 
   def code_setter_mode; end
 end
