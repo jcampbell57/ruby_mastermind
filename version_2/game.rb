@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative 'code_setter'
+require_relative 'code_breaker'
+
 # primary game logic
 class Game
   attr_accessor :mode, :code, :guess_count, :computer_guesses
@@ -59,25 +62,34 @@ class Game
     self.guess_count -= 1
     end_game(player_guess) if player_guess == code.join || guess_count.zero?
     code_copy = code.dup
-    hints = []
+    hints = flag_exact_matches(player_guess, [])
+    hints = flag_misplaced_matches(player_guess, hints)
+    self.code = code_copy
+    hints
+  end
+
+  def flag_exact_matches(player_guess, hints)
     # mark all correct
     player_guess.split('').each_with_index do |number, index|
-      next unless code_copy[index] == number
+      next unless code[index] == number
 
-      code_copy[index] = 'X'
+      code[index] = 'X'
       hints << 'X'
       player_guess[index] = '0'
       computer_guesses[:exact][index] = number
     end
+    hints
+  end
+
+  def flag_misplaced_matches(player_guess, hints)
     # mark all correct, but incorrect position
     player_guess.split('').each do |number|
-      next unless code_copy.include?(number)
+      next unless code.include?(number)
 
-      code_copy[code_copy.index(number)] = 'O'
+      code[code.index(number)] = 'O'
       hints << 'O'
       computer_guesses[:misplaced] << number
     end
-    # return hints
     hints
   end
 
@@ -118,63 +130,13 @@ class Game
   def prompt_another_game
     print 'Would you like to play again? [Y/N]: '
     input = gets.chomp
-    if input.upcase == 'Y'
-      Game.new
-    elsif input.upcase == 'N'
+    Game.new if input.upcase == 'Y'
+    if input.upcase == 'N'
       puts 'Goodbye!'
       exit
     else
       puts 'Invalid input!'
       prompt_another_game
     end
-  end
-
-  # code breaker specific methods
-
-  def code_breaker_mode
-    randomize_code
-    prompt_player_input
-  end
-
-  def randomize_code
-    code_bank = %w[1 2 3 4 5 6]
-    self.code = []
-    4.times { code << code_bank.sample }
-  end
-
-  def prompt_player_input
-    puts "Guesses left: #{guess_count}" if guess_count < 12
-    print 'Guess the code: '
-    puts "Hints: #{process_guess(validate_input(gets.chomp.to_i.to_s))}"
-    prompt_player_input
-  end
-
-  # code setter specific methods
-
-  def code_setter_mode
-    print 'Enter a code for the computer to break: '
-    self.code = validate_input(gets.chomp.to_i.to_s).split('')
-    computer_move
-  end
-
-  def computer_move
-    # mark known guesses
-    current_guess = computer_guesses[:exact].dup
-    puts "Guesses left: #{guess_count}" if guess_count < 12
-    print 'Computer guess is: '
-    4.times do |i|
-      # place guesses
-      if !computer_guesses[:misplaced].nil? && current_guess[i].nil?
-        current_guess[i] = computer_guesses[:misplaced].sample
-        computer_guesses[:misplaced].delete(current_guess[i])
-      end
-      current_guess[i] = %w[1 2 3 4 5 6].sample if current_guess[i].nil?
-      sleep 0.3
-      print "#{current_guess[i]}"
-    end
-    sleep 0.3
-    puts
-    puts "Hints: #{process_guess(current_guess.join)}"
-    computer_move
   end
 end
