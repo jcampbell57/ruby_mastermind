@@ -2,13 +2,12 @@
 
 # primary game logic
 class Game
-  attr_accessor :mode, :code, :guess_count
-
-  @@computer_guesses = { exact: [], misplaced: [] }
+  attr_accessor :mode, :code, :guess_count, :computer_guesses
 
   def initialize
     display_info
     self.guess_count = 12
+    self.computer_guesses = { exact: [], misplaced: [] }
     prompt_game_mode
     start_game
   end
@@ -68,7 +67,7 @@ class Game
       code_copy[index] = 'X'
       hints << 'X'
       player_guess[index] = '0'
-      @@computer_guesses[:exact][index] = number
+      computer_guesses[:exact][index] = number
     end
     # mark all correct, but incorrect position
     player_guess.split('').each do |number|
@@ -76,7 +75,7 @@ class Game
 
       code_copy[code_copy.index(number)] = 'O'
       hints << 'O'
-      @@computer_guesses[:misplaced] << number
+      computer_guesses[:misplaced] << number
     end
     # return hints
     hints
@@ -160,21 +159,21 @@ class Game
 
   def computer_move
     # mark known guesses
-    current_guess = @@computer_guesses[:exact].dup
+    current_guess = computer_guesses[:exact].dup
     puts "Guesses left: #{guess_count}" if guess_count < 12
     print 'Computer guess is: '
     4.times do |i|
       # place guesses
-      if !@@computer_guesses[:misplaced].nil? && current_guess[i].nil?
-        current_guess[i] = @@computer_guesses[:misplaced].sample
-        @@computer_guesses[:misplaced].delete(current_guess[i])
+      if !computer_guesses[:misplaced].nil? && current_guess[i].nil?
+        current_guess[i] = computer_guesses[:misplaced].sample
+        computer_guesses[:misplaced].delete(current_guess[i])
       end
       current_guess[i] = %w[1 2 3 4 5 6].sample if current_guess[i].nil?
       sleep 0.3
       print "#{current_guess[i]}"
     end
+    sleep 0.3
     puts
-    puts @@computer_guesses[:misplaced]
     puts "Hints: #{process_guess(current_guess.join)}"
     computer_move
   end
