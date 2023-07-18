@@ -10,7 +10,7 @@ class Game
   def initialize
     display_info
     self.guess_count = 12
-    self.computer_guesses = { exact: [], misplaced: [] }
+    self.computer_guesses = { exact: [], misplaced: [], possible: %w[1 2 3 4 5 6] }
     prompt_game_mode
     start_game
   end
@@ -84,11 +84,13 @@ class Game
   def flag_misplaced_matches(player_guess, hints)
     # mark all correct, but incorrect position
     player_guess.split('').each do |number|
-      next unless code.include?(number)
-
-      code[code.index(number)] = 'O'
-      hints << 'O'
-      computer_guesses[:misplaced] << number
+      if code.include?(number)
+        code[code.index(number)] = 'O'
+        hints << 'O'
+        computer_guesses[:misplaced] << number
+      else
+        computer_guesses[:possible].delete(number)
+      end
     end
     hints
   end

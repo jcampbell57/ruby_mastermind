@@ -15,7 +15,7 @@ def computer_move
       current_guess[i] = computer_guesses[:misplaced].sample
       computer_guesses[:misplaced].delete(current_guess[i])
     end
-    current_guess[i] = %w[1 2 3 4 5 6].sample if current_guess[i].nil?
+    current_guess[i] = computer_guesses[:possible].sample if current_guess[i].nil?
     sleep 0.3
     print "#{current_guess[i]}"
   end
