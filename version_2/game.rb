@@ -44,14 +44,14 @@ class Game
   # game administration methods
 
   def validate_input(player_input)
-    if player_input.digits.count != 4
+    if player_input.length != 4
       print 'Input a four digit code (eg: 1234): '
-      validate_input(gets.chomp.to_i)
-    elsif player_input.to_s.match(/[1-6]/)
+      validate_input(gets.chomp.to_i.to_s)
+    elsif player_input.split('').all?(/[1-6]/)
       player_input
     else
       print 'Input a four digit code with digits 1-6: '
-      validate_input(gets.chomp.to_i)
+      validate_input(gets.chomp.to_i.to_s)
     end
   end
 
@@ -70,14 +70,12 @@ class Game
   def process_breaker_game(player_input)
     if player_input == code.join
       puts "You broke the code in #{12 - guess_count} guesses!"
-      prompt_another_game
     elsif guess_count.zero? 0
-      puts 'You ran out of guesses!'
-      prompt_another_game
+      puts "You ran out of guesses! The code was #{code}."
     else
       puts 'I am not sure how that game ended.'
-      prompt_another_game
     end
+    prompt_another_game
   end
 
   def process_setter_game
@@ -112,27 +110,33 @@ class Game
   end
 
   def prompt_player_input
-    end_game if guess_count.zero?
     puts "Guesses left: #{guess_count}" if guess_count < 12
     print 'Guess the code: '
-    puts "Hints: #{process_guess(validate_input(gets.chomp.to_i))}"
+    puts "Hints: #{process_guess(validate_input(gets.chomp.to_i.to_s))}"
+    prompt_player_input
   end
 
   def process_guess(player_guess)
     self.guess_count -= 1
-    end_game(player_guess) if player_guess == code.join
-    code_copy = code
+    end_game(player_guess) if player_guess == code.join || guess_count.zero?
+    code_copy = code.dup
     hints = []
-    player_guess.digits.each_with_index do |number, index|
-      if code_copy[index] == number
-        code_copy[index] = 'X'
-        hints << 'X'
-        next
-      elsif code_copy.include?(number)
+    # mark all correct
+    player_guess.split('').each_with_index do |number, index|
+      next unless code_copy[index] == number
+
+      code_copy[index] = 'X'
+      hints << 'X'
+      player_guess[index] = '0'
+    end
+    # mark all correct, but incorrect position
+    player_guess.split('').each do |number|
+      if code_copy.include?(number)
         code_copy[code_copy.index(number)] = 'O'
         hints << 'O'
       end
     end
+    # return hints
     hints
   end
 
